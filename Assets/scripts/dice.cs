@@ -10,7 +10,7 @@ public class dice : MonoBehaviour
   public bool isthrowable = true;
   public Sprite[] dicefaces;
   public Sprite none;
-  Animator ani;
+  public Animator ani;
   void Start(){
     ani = gameObject.GetComponent<Animator>();
     gm = FindObjectOfType<gamemanager>();
@@ -29,7 +29,7 @@ public class dice : MonoBehaviour
       gameObject.GetComponent<SpriteRenderer>().sprite = none;
       yield return new WaitForSeconds(0.5f);
       diceclone.SetActive(false);
-      step = Random.Range(1, 7);
+      step = Random.Range(4, 7);
       gameObject.GetComponent<SpriteRenderer>().sprite = dicefaces[step-1];
       yield return new WaitForSeconds(0.5f);
       gm.dicethrown(step);

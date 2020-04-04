@@ -2356,6 +2356,30 @@ MonoBehaviour:
   - {fileID: 72657976}
   - {fileID: 1100205229}
   - {fileID: 1625108632}
+  - {fileID: 510616744}
+  - {fileID: 1446747416}
+  - {fileID: 792142590}
+  - {fileID: 997550865}
+  - {fileID: 1586407713}
+  - {fileID: 1303315047}
+  - {fileID: 1218282983}
+  - {fileID: 879963879}
+  - {fileID: 1375983774}
+  - {fileID: 1019031134}
+  - {fileID: 701565798}
+  - {fileID: 355437800}
+  - {fileID: 1337490186}
+  - {fileID: 77888688}
+  - {fileID: 488439769}
+  - {fileID: 854267114}
+  - {fileID: 709721523}
+  - {fileID: 560161711}
+  - {fileID: 525097843}
+  - {fileID: 352442180}
+  - {fileID: 783941953}
+  - {fileID: 1793175457}
+  - {fileID: 1934085187}
+  - {fileID: 696036301}
   elsecanmove: 1
   dice: {fileID: 2108399501}
   diceclone: {fileID: 1293781416}
@@ -2389,7 +2413,8 @@ MonoBehaviour:
   curplayer: 0
   addpos: 0
   someoneplayed: 0
-  endedturn: 0
+  cancontinue: 0
+  safepoints: 00000000080000000d000000150000001a00000022000000270000002f000000
 --- !u!1001 &510616743
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -8318,6 +8343,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 0cc62ab73569c7f4e9bdda1617b2350e, type: 3}
   - {fileID: 21300000, guid: 9a3493fdfc2a0c64fa9ed4c7b6f711c5, type: 3}
   none: {fileID: 0}
+  ani: {fileID: 0}
 --- !u!95 &2108399506
 Animator:
   serializedVersion: 3
