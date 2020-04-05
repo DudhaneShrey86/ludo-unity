@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 114155787893306318}
   - component: {fileID: 58800967667146584}
   - component: {fileID: 50996417234741582}
+  - component: {fileID: 95869055483403892}
   m_Layer: 0
   m_Name: yellow piece
   m_TagString: yellowpiece
@@ -100,9 +101,8 @@ MonoBehaviour:
   initialpoint: 39
   isallowedin: 0
   onstart: 1
-  step: 0
   myturn: 0
-  endedturn: 0
+  won: 0
 --- !u!58 &58800967667146584
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -140,3 +140,22 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 4
+--- !u!95 &95869055483403892
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1768602240028757683}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 9818e4c9b6e48ee45ba519291b734d75, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0

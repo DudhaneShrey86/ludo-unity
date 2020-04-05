@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 114923957407228528}
   - component: {fileID: 58183089844274934}
   - component: {fileID: 50246499201590574}
+  - component: {fileID: 95697220025203176}
   m_Layer: 0
   m_Name: red piece
   m_TagString: redpiece
@@ -100,9 +101,8 @@ MonoBehaviour:
   initialpoint: 13
   isallowedin: 0
   onstart: 1
-  step: 0
   myturn: 0
-  endedturn: 0
+  won: 0
 --- !u!58 &58183089844274934
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -140,3 +140,22 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 4
+--- !u!95 &95697220025203176
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7247383789938548910}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 9818e4c9b6e48ee45ba519291b734d75, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0

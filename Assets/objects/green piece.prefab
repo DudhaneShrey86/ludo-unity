@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 114725338517672000}
   - component: {fileID: 58605014100460946}
   - component: {fileID: 50545203069572492}
+  - component: {fileID: 172326123661997014}
   m_Layer: 0
   m_Name: green piece
   m_TagString: greenpiece
@@ -100,9 +101,8 @@ MonoBehaviour:
   initialpoint: 26
   isallowedin: 0
   onstart: 1
-  step: 0
   myturn: 0
-  endedturn: 0
+  won: 0
 --- !u!58 &58605014100460946
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -140,3 +140,22 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 4
+--- !u!95 &172326123661997014
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1970434148380876728}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 9818e4c9b6e48ee45ba519291b734d75, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0

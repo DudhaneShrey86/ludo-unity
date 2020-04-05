@@ -18,8 +18,10 @@ public class gamemanager : MonoBehaviour
   public bool someoneplayed = false;
   public bool cancontinue = false;
   int noofplayersoutside = 0;
+  int[] winpoints = {58, 64, 70, 76};
   GameObject playeroutside;
   public int[] safepoints = {0, 8, 13, 21, 26, 34, 39, 47};
+  Vector2 normalsize
 
   void Start(){
     dicescript = dice.GetComponent<dice>();
@@ -35,6 +37,8 @@ public class gamemanager : MonoBehaviour
       playermovement playerscript = piece.GetComponent<playermovement>();
       if(piece.tag == players[curplayer]){
         playerscript.myturn = true;
+        piece.GetComponent<SpriteRenderer>().sortingOrder = 1;
+        showeligibleplayers(piece.tag);
         if(playerscript.onstart != true){
           flag = 1;
           noofplayersoutside += 1;
@@ -54,6 +58,7 @@ public class gamemanager : MonoBehaviour
         playrandomplayer();
       }
       else{
+        selectplayers(players[curplayer], "normalizeplayers");
         endturn();
       }
     }
@@ -61,6 +66,39 @@ public class gamemanager : MonoBehaviour
       autoplay(playeroutside);
     }
   }
+
+  public void showeligibleplayers(string tagname){
+    GameObject[] selectedplayers = GameObject.FindGameObjectsWithTag(tagname);
+    playermovement playerscript;
+    foreach(GameObject player in selectedplayers){
+      playerscript = player.GetComponent<playermovement>();
+      if(playerscript.onstart == true){
+        if(addpos == 6){
+          player.GetComponent<Animator>().SetBool("iseligible", true);
+        }
+      }
+      else{
+        if(winpoints[curplayer] - playerscript.currentpoint >= addpos){
+          player.GetComponent<Animator>().SetBool("iseligible", true);
+        }
+      }
+    }
+  }
+  public void selectplayers(string tagname,string action){
+    GameObject[] selectedplayers = GameObject.FindGameObjectsWithTag(tagname);
+    if(action == "normalizeplayers"){
+      foreach(GameObject selectedplayer in selectedplayers){
+        selectedplayer.GetComponent<SpriteRenderer>().sortingOrder = 0;
+        selectedplayer.GetComponent<Animator>().SetBool("iseligible", false);
+      }
+    }
+    if(action == "allowin"){
+      foreach(GameObject selectedplayer in selectedplayers){
+        selectedplayer.GetComponent<playermovement>().isallowedin = true;
+      }
+    }
+  }
+
   public void playrandomplayer(){
     GameObject randplayer = GameObject.FindGameObjectsWithTag(players[curplayer])[0];
     autoplay(randplayer);
@@ -72,7 +110,9 @@ public class gamemanager : MonoBehaviour
 
   public void moveplayer(GameObject player, int curpos){
     movecoroutine = moveplayerroutine(player, curpos);
-    StartCoroutine(movecoroutine);
+    if(winpoints[curplayer] - curpos >= addpos){
+      StartCoroutine(movecoroutine);
+    }
   }
   public void checkturn(GameObject player, playermovement playerscript){
     string playertag = player.tag;
@@ -84,7 +124,9 @@ public class gamemanager : MonoBehaviour
           playermovement enemyscript = piece.GetComponent<playermovement>();
           if(enemyscript.currentpoint == playerpos){
             enemyscript.gotkilled();
-            playerscript.isallowedin = true;
+            if(playerscript.isallowedin == false){
+              selectplayers(playertag, "allowin");
+            }
             cancontinue = true;
           }
         }
@@ -132,8 +174,26 @@ public class gamemanager : MonoBehaviour
   public void autothrow(){
     dicescript.autodice();
   }
+  public void checkifwon(GameObject player){
+    player.GetComponent<playermovement>().won = true;
+    int flag = 1;
+    GameObject[] players = GameObject.FindGameObjectsWithTag(player.tag);
+    foreach(GameObject p in players){
+      if(p.GetComponent<playermovement>().won == false){
+        flag = 0;
+        break;
+      }
+    }
+    if(flag == 1){
+      wongame(player);
+    }
+  }
+  public void wongame(GameObject player){
+    Debug.Log("Won the game");
+  }
   IEnumerator moveplayerroutine(GameObject player, int curpos){
     if(elsecanmove){
+      selectplayers(player.tag, "normalizeplayers");
       elsecanmove = false;
       bool cangoin = false;
       int goatpoint = 0;
@@ -145,19 +205,19 @@ public class gamemanager : MonoBehaviour
         cangoin = true;
         if(playertag == "bluepiece"){
           goatpoint = 50;
-          goinpoint = 52;
+          goinpoint = 53;
         }
         else if(playertag == "redpiece"){
           goatpoint = 11;
-          goinpoint = 58;
+          goinpoint = 59;
         }
         else if(playertag == "greenpiece"){
           goatpoint = 24;
-          goinpoint = 64;
+          goinpoint = 65;
         }
         else if(playertag == "yellowpiece"){
           goatpoint = 37;
-          goinpoint = 70;
+          goinpoint = 71;
         }
       }
       if(addpos == 6){
@@ -171,6 +231,10 @@ public class gamemanager : MonoBehaviour
       }
       else{
         while(addpos != 0){
+          if(curpos == winpoints[curplayer]){
+            checkifwon(player);
+            break;
+          }
           if(cangoin == true && curpos == goatpoint){
             curpos = goinpoint;
             addpos -= 1;
@@ -178,7 +242,7 @@ public class gamemanager : MonoBehaviour
           else{
             curpos += 1;
             addpos -= 1;
-            if(curpos == 52 && cangoin == false){
+            if(curpos == 52){
               curpos = 0;
             }
           }

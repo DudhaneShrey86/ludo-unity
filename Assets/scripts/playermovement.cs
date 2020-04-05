@@ -11,6 +11,7 @@ public class playermovement : MonoBehaviour
   public bool isallowedin = false;
   public bool onstart = true;
   public bool myturn = false;
+  public bool won = false;
 
   void Awake(){
     initialpos = gameObject.transform.position;
@@ -19,7 +20,7 @@ public class playermovement : MonoBehaviour
     gm = FindObjectOfType<gamemanager>();
   }
   public void OnMouseDown(){
-    if(myturn && !gm.someoneplayed){
+    if(myturn && !gm.someoneplayed && !won){
       gm.moveplayer(gameObject, currentpoint);
     }
   }
