@@ -9,6 +9,7 @@ TagManager:
   - greenpiece
   - yellowpiece
   - redpiece
+  - wonpiece
   layers:
   - Default
   - TransparentFX

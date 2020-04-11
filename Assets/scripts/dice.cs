@@ -27,11 +27,11 @@ public class dice : MonoBehaviour
       ani.SetBool("isactive", false);
       diceclone.SetActive(true);
       gameObject.GetComponent<SpriteRenderer>().sprite = none;
-      yield return new WaitForSeconds(0.5f);
+      yield return new WaitForSeconds(0.2f);
       diceclone.SetActive(false);
-      step = Random.Range(4, 7);
+      step = Random.Range(1, 7);
       gameObject.GetComponent<SpriteRenderer>().sprite = dicefaces[step-1];
-      yield return new WaitForSeconds(0.5f);
+      yield return new WaitForSeconds(0.2f);
       gm.dicethrown(step);
     }
     else{

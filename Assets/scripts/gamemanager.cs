@@ -5,6 +5,7 @@ public class gamemanager : MonoBehaviour
 {
   public Transform[] pointsarr;
   public IEnumerator movecoroutine;
+  public IEnumerator aiplays;
   public bool elsecanmove = true;
   public GameObject dice;
   public GameObject diceclone;
@@ -17,11 +18,17 @@ public class gamemanager : MonoBehaviour
   public int addpos = 0;
   public bool someoneplayed = false;
   public bool cancontinue = false;
+  public bool sixflag = false;
   int noofplayersoutside = 0;
-  int[] winpoints = {58, 64, 70, 76};
+  public int[] winpoints = {58, 64, 70, 76};
   GameObject playeroutside;
   public int[] safepoints = {0, 8, 13, 21, 26, 34, 39, 47};
-  Vector2 normalsize
+  public GameObject playertomove;
+  public bool gotplayer;
+  public bool wonthegame;
+  public List<string> playerranks = new List<string>();
+  string playerlast;
+  public GameObject winpanel;
 
   void Start(){
     dicescript = dice.GetComponent<dice>();
@@ -29,7 +36,9 @@ public class gamemanager : MonoBehaviour
   }
 
   public void dicethrown(int noondice){
+    playertomove = null;
     cancontinue = false;
+    sixflag = false;
     noofplayersoutside = 0;
     int flag = 0;
     addpos = noondice;
@@ -53,18 +62,209 @@ public class gamemanager : MonoBehaviour
     }
     dicescript.isthrowable = false;
     someoneplayed = false;
-    if(flag == 0){
-      if(addpos == 6){
+    /////////////////aiplays////////////////
+    // if(curplayer != 0){
+    //   aiplays = aiplayscoroutine(flag, noofplayersoutside, playeroutside);
+    //   StartCoroutine(aiplays);
+    // }
+    // else{
+    //   playessentials(flag, noofplayersoutside, playeroutside);
+    // }
+    aiplays = aiplayscoroutine(flag, noofplayersoutside, playeroutside);
+    StartCoroutine(aiplays);
+  }
+  public void playessentials(int flag,int noofplayersoutside,GameObject playeroutside){
+    GameObject[] allplayers = GameObject.FindGameObjectsWithTag(players[curplayer]);
+    if(addpos == 6){
+      if(flag == 0){
+        playrandomplayer();
+      }
+      if(noofplayersoutside == 4){
+        if(shouldskip(allplayers)){
+          skipturn();
+        }
+      }
+    }
+    else{
+      if(flag == 0){
+        skipturn();
+      }
+      if(shouldskip(allplayers)){
+        skipturn();
+      }
+    }
+  }
+  public bool shouldskip(GameObject[] allplayers){
+    bool shouldskipturn = true;
+    foreach(GameObject player in allplayers){
+      if(player.GetComponent<playermovement>().currentpoint + addpos <= winpoints[curplayer]){
+        shouldskipturn = false;
+        break;
+      }
+    }
+    return shouldskipturn;
+  }
+  IEnumerator aiplayscoroutine(int flag, int noofplayersoutside, GameObject playeroutside){
+    yield return new WaitForSeconds(0.01f);
+    GameObject[] allplayers = GameObject.FindGameObjectsWithTag(players[curplayer]);
+    if(addpos == 6){
+      if(flag == 0){
         playrandomplayer();
       }
       else{
-        selectplayers(players[curplayer], "normalizeplayers");
-        endturn();
+        if(noofplayersoutside <= 2){
+          bringplayeroutside(allplayers);
+        }
+        else if(noofplayersoutside <= 3){
+          if(!checkifwinsorgoesinside(allplayers)){
+            if(!killssomeone(allplayers)){
+              if(!goestosafepoint(allplayers)){
+                bringplayeroutside(allplayers);
+              }
+            }
+          }
+        }
+        else{
+          if(!checkifwinsorgoesinside(allplayers)){
+            if(!killssomeone(allplayers)){
+              if(!goestosafepoint(allplayers)){
+                randomplayorskip(allplayers);
+              }
+            }
+          }
+        }
       }
     }
-    if(noofplayersoutside == 1 && addpos != 6){
-      autoplay(playeroutside);
+    else{
+      if(flag == 0){
+        skipturn();
+      }
+      else{
+        if(!checkifwinsorgoesinside(allplayers)){
+          if(!killssomeone(allplayers)){
+            if(!goestosafepoint(allplayers)){
+              randomplayorskip(allplayers);
+            }
+          }
+        }
+      }
     }
+  }
+  public void bringplayeroutside(GameObject[] allplayers){
+    gotplayer = false;
+    foreach(GameObject player in allplayers){
+      if(player.GetComponent<playermovement>().onstart == true){
+        playertomove = player;
+        gotplayer = true;
+        break;
+      }
+    }
+    if(gotplayer){
+      autoplay(playertomove);
+    }
+    else{
+      skipturn();
+    }
+  }
+  ////might have to bring return true outside
+  public bool checkifwinsorgoesinside(GameObject[] allplayers){
+    playermovement playerscript;
+    gotplayer = false;
+    foreach(GameObject player in allplayers){
+      playerscript = player.GetComponent<playermovement>();
+      if(playerscript.won != true){
+        if(playerscript.currentpoint + addpos == winpoints[curplayer]){
+          playertomove = player;
+          gotplayer = true;
+          break;
+        }
+        else if((playerscript.currentpoint + addpos >= winpoints[curplayer]-5) && (playerscript.currentpoint + addpos < winpoints[curplayer])){
+          playertomove = player;
+          gotplayer = true;
+          break;
+        }
+      }
+    }
+    if(gotplayer == true){
+      autoplay(playertomove);
+    }
+    return gotplayer;
+  }
+  public bool killssomeone(GameObject[] allplayers){
+    playermovement playerscript;
+    string playertag = players[curplayer];
+    gotplayer = false;
+    int futurepos;
+    playermovement enemyscript;
+    foreach(GameObject player in allplayers){
+      playerscript = player.GetComponent<playermovement>();
+      futurepos = playerscript.currentpoint + addpos;
+      if(!checkifsafe(futurepos)){
+        if(playerscript.onstart == false && playerscript.won == false){
+          foreach(GameObject enemy in pieces){
+            enemyscript = enemy.GetComponent<playermovement>();
+            if(enemy.tag != playertag){
+              if(enemyscript.currentpoint == futurepos && enemyscript.isinside == false){
+                playertomove = player;
+                gotplayer = true;
+                break;
+              }
+            }
+          }
+        }
+      }
+      if(gotplayer){
+        break;
+      }
+    }
+    if(gotplayer){
+      autoplay(playertomove);
+    }
+    return gotplayer;
+  }
+  public bool goestosafepoint(GameObject[] allplayers){
+    gotplayer = false;
+    int futurepos;
+    playermovement playerscript;
+    foreach(GameObject player in allplayers){
+      playerscript = player.GetComponent<playermovement>();
+      futurepos = playerscript.currentpoint + addpos;
+      if(playerscript.won == false){
+        if(checkifsafe(futurepos) && playerscript.onstart == false){
+          playertomove = player;
+          gotplayer = true;
+          break;
+        }
+      }
+    }
+    if(gotplayer){
+      autoplay(playertomove);
+    }
+    return gotplayer;
+  }
+  public void randomplayorskip(GameObject[] allplayers){
+    bool gotplayer = false;
+    playermovement playerscript;
+    foreach(GameObject player in allplayers){
+      playerscript = player.GetComponent<playermovement>();
+      if(playerscript.won == false){
+        if(playerscript.currentpoint + addpos < winpoints[curplayer] && playerscript.onstart == false){
+          playertomove = player;
+          gotplayer = true;
+          break;
+        }
+      }
+    }
+    if(gotplayer){
+      autoplay(playertomove);
+    }
+    else{
+      skipturn();
+    }
+  }
+  public void skipturn(){
+    selectplayers(players[curplayer], "normalizeplayers");
+    endturn();
   }
 
   public void showeligibleplayers(string tagname){
@@ -98,11 +298,12 @@ public class gamemanager : MonoBehaviour
       }
     }
   }
-
   public void playrandomplayer(){
     GameObject randplayer = GameObject.FindGameObjectsWithTag(players[curplayer])[0];
     autoplay(randplayer);
   }
+
+  //this playes player automatically
   public void autoplay(GameObject playeroutside){
     int playerpos = playeroutside.GetComponent<playermovement>().currentpoint;
     moveplayer(playeroutside, playerpos);
@@ -132,6 +333,9 @@ public class gamemanager : MonoBehaviour
         }
       }
     }
+    if(sixflag){
+      cancontinue = true;
+    }
     checkifcontinue();
   }
   public bool checkifsafe(int playerpos){
@@ -150,6 +354,10 @@ public class gamemanager : MonoBehaviour
       dicescript.ani.SetBool("isactive", true);
       elsecanmove = true;
       someoneplayed = true;
+      // if(curplayer != 0){
+      //   autothrow();
+      // }
+      autothrow();
     }
     else{
       endturn();
@@ -161,6 +369,16 @@ public class gamemanager : MonoBehaviour
     if(curplayer >= 4){
       curplayer = 0;
     }
+    GameObject sampleplayer = GameObject.FindGameObjectsWithTag(players[curplayer])[0];
+    if(sampleplayer.GetComponent<playermovement>().allwon == true){
+      endturn();
+    }
+    // if(curplayer == 3){
+    //   curplayer = 0;
+    // }
+    // else{
+    //   curplayer += 1;
+    // }
     dicescript.isthrowable = true;
     someoneplayed = true;
     changedicepos();
@@ -169,35 +387,66 @@ public class gamemanager : MonoBehaviour
     dice.transform.position = holders[curplayer].position;
     diceani.SetBool("isactive", true);
     diceclone.transform.position = holders[curplayer].position;
+    // if(curplayer != 0){
+    //   autothrow();
+    // }
     autothrow();
   }
   public void autothrow(){
     dicescript.autodice();
   }
-  public void checkifwon(GameObject player){
-    player.GetComponent<playermovement>().won = true;
-    int flag = 1;
-    GameObject[] players = GameObject.FindGameObjectsWithTag(player.tag);
-    foreach(GameObject p in players){
-      if(p.GetComponent<playermovement>().won == false){
-        flag = 0;
+  public void checkifwholewon(string playertag){
+    GameObject[] allplayers = GameObject.FindGameObjectsWithTag(playertag);
+    wonthegame = true;
+    foreach(GameObject player in allplayers){
+      if(player.GetComponent<playermovement>().won == false){
+        wonthegame = false;
         break;
       }
     }
-    if(flag == 1){
-      wongame(player);
+    if(wonthegame){
+      playerwon(playertag, allplayers);
     }
   }
-  public void wongame(GameObject player){
-    Debug.Log("Won the game");
+  public void playerwon(string ptag, GameObject[] allplayers){
+    playerranks.Add(ptag);
+    GameObject[] currentplayers = GameObject.FindGameObjectsWithTag(ptag);
+    foreach(GameObject player in currentplayers){
+      player.GetComponent<playermovement>().allwon = true;
+    }
+    if(playerranks.Count == 3){
+      addlastplayer(allplayers);
+    }
   }
+  public void addlastplayer(GameObject[] allplayers){
+    foreach(GameObject player in allplayers){
+      if(player.GetComponent<playermovement>().won == false){
+        playerlast = player.tag;
+        break;
+      }
+    }
+    playerranks.Add(playerlast);
+    finishgame();
+  }
+  public void finishgame(){
+    stopgame();
+    winpanel.SetActive(true);
+  }
+  public void stopgame(){
+    
+  }
+
   IEnumerator moveplayerroutine(GameObject player, int curpos){
+    stopgame();
     if(elsecanmove){
       selectplayers(player.tag, "normalizeplayers");
       elsecanmove = false;
+      wonthegame = false;
+      sixflag = false;
       bool cangoin = false;
       int goatpoint = 0;
       int goinpoint = 0;
+      bool haswon = false;
       playermovement playerscript = player.GetComponent<playermovement>();
       //check if it can go in
       if(playerscript.isallowedin == true){
@@ -221,7 +470,7 @@ public class gamemanager : MonoBehaviour
         }
       }
       if(addpos == 6){
-        cancontinue = true;
+        sixflag = true;
       }
       if(playerscript.onstart){
         if(addpos == 6){
@@ -231,12 +480,9 @@ public class gamemanager : MonoBehaviour
       }
       else{
         while(addpos != 0){
-          if(curpos == winpoints[curplayer]){
-            checkifwon(player);
-            break;
-          }
           if(cangoin == true && curpos == goatpoint){
             curpos = goinpoint;
+            playerscript.isinside = true;
             addpos -= 1;
           }
           else{
@@ -247,7 +493,14 @@ public class gamemanager : MonoBehaviour
             }
           }
           player.transform.position = pointsarr[curpos].position;
-          yield return new WaitForSeconds(0.15f);
+          if(curpos >= winpoints[curplayer]){
+            haswon = true;
+            break;
+          }
+          yield return new WaitForSeconds(0.1f);
+        }
+        if(haswon){
+          playerscript.haswon();
         }
       }
       playerscript.currentpoint = curpos;

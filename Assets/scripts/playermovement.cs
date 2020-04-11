@@ -12,7 +12,8 @@ public class playermovement : MonoBehaviour
   public bool onstart = true;
   public bool myturn = false;
   public bool won = false;
-
+  public bool allwon = false;
+  public bool isinside = false;
   void Awake(){
     initialpos = gameObject.transform.position;
   }
@@ -29,4 +30,10 @@ public class playermovement : MonoBehaviour
     gameObject.transform.position = initialpos;
     onstart = true;
   }
+  public void haswon(){
+    won = true;
+    Debug.Log("won");
+    gm.checkifwholewon(gameObject.tag);
+  }
+
 }

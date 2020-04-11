@@ -1,0 +1,21 @@
+throw != 6
+  1. no players outside = skip turn
+  2. players outside and inside
+      a. check if outside player wins
+      b. check if outside goes to inner points (red goes to red points where other cannot enter)
+      c. check if outside kills someone
+      d. check if outside goes to some safe point (may depend on whos behind it)
+      e. check if outside is behind someone (to kill it)
+
+throw = 6
+  1. no players outside = randomly play one player
+  2. players outside and inside
+      a. check if outside player wins
+      f. bring inside's player outside. (its priority depends on no. of players outside)
+      b. check if outside goes to inner points (red goes to red points where other cannot enter)
+      c. check if outside kills someone
+      d. check if outside goes to some safe point (may depend on whos behind it)
+      e. check if outside is behind someone (to kill it)
+
+
+ACTUALLY POINT 2 IS ALMOST SAME FOR BOTH THE CASES hehe
